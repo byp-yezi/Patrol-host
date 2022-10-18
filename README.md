@@ -18,7 +18,8 @@ pip install xlrd==1.2.0
 ```
 
 ## 2、使用方法
-### 在host.xls文件中填入主机信息主机IP、SSH端口、主机用户名、主机密码、执行命令的文件名
+### 在host.xls文件中填入主机信息主机IP、SSH端口、主机用户名、主机密码、主机密钥、执行命令的文件名
+###密码登录填密码，密钥登录填密钥
 例如：
 
  IP  | Port  | UserName  | Password  | Private_key | CMD_File |
