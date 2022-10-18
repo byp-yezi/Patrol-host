@@ -114,11 +114,21 @@ if __name__ == "__main__":
     borders.right = 1
     borders.top = 1
     borders.bottom = 1
+    # 单元格背景色
+    pattern = xlwt.Pattern()
+    pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+    pattern.pattern_fore_colour = 5
     # 样式
     style = xlwt.easyxf()
     style.alignment = alignment
     style.font = font
     style.borders = borders
+    # 样式
+    style2 = xlwt.easyxf()
+    style2.alignment = alignment
+    style2.font = font
+    style2.borders = borders
+    style2.pattern = pattern
 
     sheet.write(0, 0, 'IP', style)
     # 写入返回值描述
@@ -129,7 +139,11 @@ if __name__ == "__main__":
     for i in range(len(data_list)):
         sheet.write(i + 1, 0, data_list[i].ip, style)
         for j in range(len(data_list[0].data)):
-            sheet.write(i + 1, j + 1, data_list[i].data[j], style)
+            if float(str(data_list[i].data[j]).replace('%', '')) > 75:
+                sheet.write(i + 1, j + 1, data_list[i].data[j], style2)
+            else:
+                sheet.write(i + 1, j + 1, data_list[i].data[j], style)
+                
     workbook.save("out.xls")
 
     print("脚本执行完毕")
