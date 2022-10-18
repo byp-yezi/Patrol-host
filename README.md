@@ -21,10 +21,10 @@ pip install xlrd==1.2.0
 ### 在host.xls文件中填入主机信息主机IP、SSH端口、主机用户名、主机密码、执行命令的文件名
 例如：
 
- IP  | Port  | UserName  | Password  | CMD_File |
- :----:  | :----:  | :----:  | :----:  | :----: |
- 192.168.1.109  | 22  | root  | 1234  | linux_check.xls |
- 192.168.1.110  | 22  | root  | 1234  | linux_check.xls |
+ IP  | Port  | UserName  | Password  | Private_key | CMD_File |
+ :----:  | :----:  | :----:  | :----: | :----: | :----: |
+ 192.168.1.109  | 22  | root  | 1234  | xxx.pem | linux_check.xls |
+ 192.168.1.110  | 22  | root  | 1234  | xxx.pem | linux_check.xls |
 
 ### 在CMD文件夹下新建执行命令的文件，填入执行的命令、返回结果的正则表达式、返回结果的描述，可参照下列格式：
 
