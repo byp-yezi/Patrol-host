@@ -12,6 +12,7 @@ print(my_list)
 
 
 
+
 # line = "some cats are smarter than dogs are true"
 # mat1 = re.match(r".* are", line)
 # mat2 = re.match(r".*? are", line)
