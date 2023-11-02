@@ -1,5 +1,4 @@
 import sys
-
 import paramiko
 
 
@@ -13,58 +12,46 @@ class SSHConnection(object):
         # self.connect()
 
     def connect(self):
-        # 密码连接
-        transport = paramiko.Transport((self.host.ip, self.host.port))
-        # 密钥连接
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        # 密钥为xisland_new.pem，但登陆异常的主机
-        exception_ip_list = ['x.x.x.x']
+        try:
+            # 密码连接
+            transport = paramiko.Transport((self.host.ip, self.host.port))
+            # 密钥连接
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        if self.host.password:
-            transport.connect(username=self.host.username, password=self.host.password)
-        else:
-            if self.host.private_key == 'xxx.pem' and self.host.ip not in exception_ip_list:
-                try:
-                    ssh.connect(hostname=self.host.ip,
-                                port=self.host.port,
-                                username=self.host.username,
-                                pkey=paramiko.RSAKey.from_private_key_file('D:\\pem\\' + self.host.private_key),
-                                disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
+            exception_ip_list_1 = ['124.71.202.191', '124.71.164.53', '124.71.149.35']
+            # 密钥为zjx--prod.pem，但登陆异常的主机
+            exception_ip_list_2 = ['121.36.194.73']
 
-                except Exception as e:
-                    print(self.host.ip)
-                    print(e)
-                    print("服务器连接失败，异常退出")
-                    sys.exit(-1)
+            if self.host.password:
+                transport.connect(username=self.host.username, password=self.host.password)
 
             else:
-                try:
+                ssh_key_path = 'D:\\xiaobao\\pem666\\' + self.host.private_key
+                if self.host.ip in exception_ip_list_2:
+
                     ssh.connect(hostname=self.host.ip,
                                 port=self.host.port,
                                 username=self.host.username,
-                                pkey=paramiko.RSAKey.from_private_key_file('D:\\pem\\' + self.host.private_key),)
+                                pkey=paramiko.RSAKey.from_private_key_file(ssh_key_path), )
 
-                except Exception as e:
-                    print(self.host.ip)
-                    print(e)
-                    print("服务器连接失败，异常退出")
-                    sys.exit(-1)
+                elif self.host.private_key == 'zjx--prod.pem' or self.host.ip in exception_ip_list_1:
+                    ssh.connect(hostname=self.host.ip,
+                                port=self.host.port,
+                                username=self.host.username,
+                                pkey=paramiko.RSAKey.from_private_key_file(ssh_key_path),
+                                disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
 
-        self.transport = transport
-        self.ssh = ssh
+                else:
+                    ssh.connect(hostname=self.host.ip,
+                                port=self.host.port,
+                                username=self.host.username,
+                                pkey=paramiko.RSAKey.from_private_key_file(ssh_key_path), )
+            self.transport = transport
+            self.ssh = ssh
 
-    # 下载
-    def download(self, remotepath, localpath):
-        if self.sftp is None:
-            self.sftp = paramiko.SFTPClient.from_transport(self.transport)
-        self.sftp.get(remotepath, localpath)
-
-    # 上传
-    def put(self, localpath, remotepath):
-        if self.sftp is None:
-            self.sftp = paramiko.SFTPClient.from_transport(self.transport)
-        self.sftp.put(localpath, remotepath)
+        except Exception as e:
+            print(f"服务器 {self.host.ip} 连接失败，异常退出: {e}")
 
     # 执行命令
     def exec_command(self, command):
@@ -73,12 +60,15 @@ class SSHConnection(object):
             self.client._transport = self.transport
         stdin, stdout, stderr = self.client.exec_command(command)
         data = stdout.read()
+        # if len(data) == 0:
+        #     print(data.strip())  # 打印正确结果
+        #     return data
         if len(data) > 0:
-            # print data.strip()  # 打印正确结果
+            # print(data.strip())  # 打印正确结果
             return data
         err = stderr.read()
         if len(err) > 0:
-            # print err.strip()  # 输出错误结果
+            # print(err.strip())  # 打印正确结果
             return err
 
     # 执行命令
