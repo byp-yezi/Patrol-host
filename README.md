@@ -22,20 +22,20 @@ pip install xlrd==1.2.0
 ###密码登录填密码，密钥登录填密钥
 例如：
 
-|      IP       | Port | UserName | Password | Private_key |     CMD_File      |      |
-| :-----------: | :--: | :------: | :------: | :---------: | :---------------: | ---- |
-| 192.168.1.109 |  22  |   root   |   1234   |   xxx.pem   |  linux_check.xls  |      |
-| 192.168.1.110 |  22  |   root   |          |   xxx.pem   | linux_check-6.xls |      |
+|      IP       | Port | UserName | Password | Private_key |     CMD_File      |
+| :-----------: | :--: | :------: | :------: | :---------: | :---------------: |
+| 192.168.1.109 |  22  |   root   |   1234   |   xxx.pem   |  linux_check.xls  |
+| 192.168.1.110 |  22  |   root   |          |   xxx.pem   | linux_check-6.xls |
 
 ### 在CMD文件夹下新建执行命令的文件，填入执行的命令、返回结果的正则表达式、返回结果的描述，可参照下列格式：
 
-| CMD                                      | CMD_RE |   Desc    |      |
-| :--------------------------------------- | :----: | :-------: | ---- |
-| idle_cpu=\`top -bn1 -i &#124; grep 'id' &#124; awk -F ',' '{print $4}' &#124; awk '{print $1}'\`;used_cpu=\`echo "100 $idle_cpu" &#124; awk '{printf("%0.1f\n",$1-$2)}'\`;awk 'BEGIN{printf"%.2f%\n",('$used_cpu')}' |   .*   |  cpu使用率   |      |
-| sum=\`free -m &#124; grep Mem &#124; awk '{print $2}'\`;use=\`free -m &#124; grep Mem &#124; awk '{print $3}'\`;awk 'BEGIN{printf"%.2f%\n",('$use'/'$sum')*100}' |   .*   |   内存使用率   |      |
-| df -h / &#124; awk 'NR==2 {print $5}'    |   .*   | /文件系统使用率  |      |
-| df -h \|grep -vE '(/dev/sda1\|/dev/vda1)' \| awk '/^\/dev\/[a-z]+/ {print $5}' |   .*   | 其他文件系统使用率 |      |
-| df -h \|awk '/[0-9]+.[0-9]+.[0-9]+.[0-9]+:\/ / {print $5}' |   .*   | 共享nas盘使用率 |      |
+| CMD                                      | CMD_RE |   Desc    |
+| :--------------------------------------- | :----: | :-------: |
+| idle_cpu=\`top -bn1 -i &#124; grep 'id' &#124; awk -F ',' '{print $4}' &#124; awk '{print $1}'\`;used_cpu=\`echo "100 $idle_cpu" &#124; awk '{printf("%0.1f\n",$1-$2)}'\`;awk 'BEGIN{printf"%.2f%\n",('$used_cpu')}' |   .*   |  cpu使用率   |
+| sum=\`free -m &#124; grep Mem &#124; awk '{print $2}'\`;use=\`free -m &#124; grep Mem &#124; awk '{print $3}'\`;awk 'BEGIN{printf"%.2f%\n",('$use'/'$sum')*100}' |   .*   |   内存使用率   |
+| df -h / &#124; awk 'NR==2 {print $5}'    |   .*   | /文件系统使用率  |
+| df -h \|grep -vE '(/dev/sda1\|/dev/vda1)' \| awk '/^\/dev\/[a-z]+/ {print $5}' |   .*   | 其他文件系统使用率 |
+| df -h \|awk '/[0-9]+.[0-9]+.[0-9]+.[0-9]+:\/ / {print $5}' |   .*   | 共享nas盘使用率 |
 
 如果不需要通过正则表达式来筛选返回值，则填入 `.*`表示取所有内容
 
