@@ -1,5 +1,5 @@
+import threading
 import time
-
 import paramiko
 import xlrd
 import re
@@ -8,6 +8,7 @@ from Data import Data
 from Host import Host
 from SSHConnection import SSHConnection
 from WriteDataToExcel import WriteDataToExcel
+from datetime import datetime
 
 
 # 读取主机列表
@@ -96,14 +97,31 @@ def execute_commands(host, password):
     return Data(host.ip, desc, data)
 
 
+# 处理单个主机的函数，该函数会在一个独立的线程中执行
+def process_host(host, data_list_lock, data_list):
+    data = execute_commands(host, host.password)
+
+    # 加锁以确保多线程操作共享的数据安全
+    with data_list_lock:
+        data_list.append(data)
+
+
 # 主函数
 def main():
     host_list = read_host_list("host.xls")  # 读取主机列表
     data_list = []  # 存储执行结果的列表
+    data_list_lock = threading.Lock()  # 用于保护共享数据的锁
 
-    # 逐个主机执行命令并获取结果
+    # 逐个主机创建线程并执行命令
+    threads = []
     for host in host_list:
-        data_list.append(execute_commands(host, host.password))
+        thread = threading.Thread(target=process_host, args=(host, data_list_lock, data_list))
+        thread.start()
+        threads.append(thread)
+
+    # 等待所有线程完成
+    for thread in threads:
+        thread.join()
 
     # 创建WriteDataToExcel实例并写入Excel数据
     write_excel = WriteDataToExcel()
