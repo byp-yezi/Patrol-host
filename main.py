@@ -123,9 +123,13 @@ def main():
     for thread in threads:
         thread.join()
 
+    # 按照原始顺序排列执行结果
+    sorted_data_list = sorted(data_list, key=lambda x: host_list.index(next(host for host in host_list if host.ip == x.ip)))
+
+
     # 创建WriteDataToExcel实例并写入Excel数据
     write_excel = WriteDataToExcel()
-    write_excel.write_data_to_excel(data_list)
+    write_excel.write_data_to_excel(sorted_data_list)
 
     print("脚本执行完毕")
     # time.sleep(2)
