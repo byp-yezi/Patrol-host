@@ -8,12 +8,12 @@ from Data import Data
 from Host import Host
 from SSHConnection import SSHConnection
 from WriteDataToExcel import WriteDataToExcel
-from datetime import datetime
 
 
 # 读取主机列表
 def read_host_list(filename):
     host_list = []
+    ip_port_order = []
     # 批量读取主机列表
     workbook = xlrd.open_workbook(filename)  # 打开Excel文件
     sheet = workbook.sheet_by_index(0)  # 获取第一个工作表
@@ -37,8 +37,9 @@ def read_host_list(filename):
 
         host = Host(ip, port, username, password, private_key, cmd, cmd_re, desc)
         host_list.append(host)
+        ip_port_order.append((ip, port))  # 记录IP和端口的顺序
 
-    return host_list
+    return host_list, ip_port_order
 
 
 # 读取命令文件
@@ -94,7 +95,7 @@ def execute_commands(host, password):
         print(f"发生了其他异常: {e}")
 
     conn.close()
-    return Data(host.ip, desc, data)
+    return Data(host.ip, host.port, desc, data)
 
 
 # 处理单个主机的函数，该函数会在一个独立的线程中执行
@@ -108,7 +109,7 @@ def process_host(host, data_list_lock, data_list):
 
 # 主函数
 def main():
-    host_list = read_host_list("host.xls")  # 读取主机列表
+    host_list, ip_port_order = read_host_list("host.xls")  # 读取主机列表
     data_list = []  # 存储执行结果的列表
     data_list_lock = threading.Lock()  # 用于保护共享数据的锁
 
@@ -124,8 +125,9 @@ def main():
         thread.join()
 
     # 按照原始顺序排列执行结果
-    sorted_data_list = sorted(data_list, key=lambda x: host_list.index(next(host for host in host_list if host.ip == x.ip)))
-
+    # sorted_data_list = sorted(data_list, key=lambda x: host_list.index(next(host for host in host_list if host.ip == x.ip)))
+    ip_port_to_data = {(data.ip, data.port): data for data in data_list}
+    sorted_data_list = [ip_port_to_data[ip_port] for ip_port in ip_port_order]
 
     # 创建WriteDataToExcel实例并写入Excel数据
     write_excel = WriteDataToExcel()
