@@ -51,7 +51,7 @@ class SSHConnection(object):
             self.ssh = ssh
 
         except Exception as e:
-            print(f"服务器 {self.host.ip} 连接失败，异常退出: {e}")
+            print(f"服务器 {self.host.ip}:{self.host.port} 连接失败，异常退出: {e}")
 
     # 执行命令
     def exec_command(self, command):
